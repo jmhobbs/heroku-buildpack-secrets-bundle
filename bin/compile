@@ -10,22 +10,38 @@ indent() {
 echo "-----> Install Secrets Bundle"
 
 BUILD_DIR=$1
+ENV_DIR=$3
+
 SECRETS_DIR="$BUILD_DIR/secrets"
 
-mkdir -p "$SECRETS_DIR"
+if [ ! -f "${ENV_DIR}/SECRET_BUNDLE_URL" ] || [ ! -f "${ENV_DIR}/SECRET_BUNDLE_PASSPHRASE" ]
+then
+  echo "!!! SECRET_BUNDLE_URL or SECRET_BUNDLE_PASSPHRASE Unset !!!" | indent
+  exit 0
+fi
+
+SECRET_BUNDLE_URL="$(cat ${ENV_DIR}/SECRET_BUNDLE_URL)"
 
 cd "$BUILD_DIR"
 
-echo "Downloading bundle" | indent
+echo "Downloading bundle from $SECRET_BUNDLE_URL..." | indent
 
-wget "$SECRET_BUNDLE_URL" -O secrets.tar.gz.enc
+wget "$SECRET_BUNDLE_URL" -O secrets.tar.gz.enc | indent
 
-echo "Decrypting" | indent
+echo "Decrypting..." | indent
 
-openssl enc -aes-256-cbc -d -in secrets.tar.gz.enc -out secrets.tar.gz -k "$SECRET_BUNDLE_PASSPHRASE"
+openssl enc -aes-256-cbc -d -in secrets.tar.gz.enc -out secrets.tar.gz -k "$(cat ${ENV_DIR}/SECRET_BUNDLE_PASSPHRASE)"
 
-echo "Unpacking" | indent
+echo "Unpacking..." | indent
 
-tar -zxf secrets.tar.gz -C "$SECRETS_DIR" --strip-components=1
+rm -rf "$SECRETS_DIR"
+mkdir -p "$SECRETS_DIR"
+
+tar -zxf secrets.tar.gz -C "$SECRETS_DIR"
+
+echo "Cleaning up..." | indent
+
+rm -f secrets.tar.gz.enc
+rm -f secrets.tar.gz
 
 echo "Done!" | indent

@@ -1,4 +1,5 @@
 #!/bin/sh
 
 # SECRET_BUNDLE must be set
-[ "" != "$SECRET_BUNDLE_URL" ] || exit 1
+echo "Secrets Bundle"
+exit 0

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# SECRET_BUNDLE must be set
+[ "" != "$SECRET_BUNDLE_URL" ] || exit 1

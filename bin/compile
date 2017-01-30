@@ -1,0 +1,31 @@
+#!/bin/bash
+set -o errexit
+set -o nounset
+set -o pipefail
+
+indent() {
+  sed -u 's/^/       /'
+}
+
+echo "-----> Install Secrets Bundle"
+
+BUILD_DIR=$1
+SECRETS_DIR="$BUILD_DIR/secrets"
+
+mkdir -p "$SECRETS_DIR"
+
+cd "$BUILD_DIR"
+
+echo "Downloading bundle" | indent
+
+wget "$SECRET_BUNDLE_URL" -O secrets.tar.gz.enc
+
+echo "Decrypting" | indent
+
+openssl enc -aes-256-cbc -d -in secrets.tar.gz.enc -out secrets.tar.gz -k "$SECRET_BUNDLE_PASSPHRASE"
+
+echo "Unpacking" | indent
+
+tar -zxf secrets.tar.gz -C "$SECRETS_DIR" --strip-components=1
+
+echo "Done!" | indent

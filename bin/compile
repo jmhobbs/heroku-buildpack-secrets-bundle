@@ -10,13 +10,22 @@ indent() {
 echo "-----> Install Secrets Bundle"
 
 BUILD_DIR=$1
+CACHE_DIR=$2
 ENV_DIR=$3
 
 SECRETS_DIR="$BUILD_DIR/secrets"
+CACHE_FILE="$CACHE_DIR/secrets.tar.gz"
 
 if [ ! -f "${ENV_DIR}/SECRET_BUNDLE_URL" ] || [ ! -f "${ENV_DIR}/SECRET_BUNDLE_PASSPHRASE" ]
 then
   echo "!!! SECRET_BUNDLE_URL or SECRET_BUNDLE_PASSPHRASE Unset !!!" | indent
+  if [ ! -f "$CACHE_FILE" ]; then
+    echo "!!! Cached File Not Found !!!" | indent
+  else
+    echo "!!! Unpacking From Cache !!!" | indent
+    mkdir -p "$SECRETS_DIR"
+    tar -zxf "$CACHE_FILE" -C "$SECRETS_DIR"
+  fi
   exit 0
 fi
 
@@ -42,6 +51,8 @@ tar -zxf secrets.tar.gz -C "$SECRETS_DIR"
 echo "Cleaning up..." | indent
 
 rm -f secrets.tar.gz.enc
-rm -f secrets.tar.gz
+
+echo "Caching..." | indent
+mv secrets.tar.gz "$CACHE_FILE"
 
 echo "Done!" | indent

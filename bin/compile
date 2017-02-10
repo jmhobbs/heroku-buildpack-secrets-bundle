@@ -31,6 +31,13 @@ fi
 
 SECRET_BUNDLE_URL="$(cat ${ENV_DIR}/SECRET_BUNDLE_URL)"
 
+if [ "$SECRET_BUNDLE_URL" == "DELETE" ]; then
+  echo "!!! Deleting Secrets And Cache !!!" | indent
+  rm -rf "$SECRETS_DIR"
+  rm -f "$CACHE_FILE"
+  exit 0
+fi
+
 cd "$BUILD_DIR"
 
 echo "Downloading bundle from $SECRET_BUNDLE_URL..." | indent

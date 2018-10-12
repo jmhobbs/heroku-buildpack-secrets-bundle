@@ -44,6 +44,8 @@ echo "Downloading bundle from $SECRET_BUNDLE_URL..." | indent
 
 wget "$SECRET_BUNDLE_URL" -O secrets.tar.gz.enc | indent
 
+echo "OpenSSL Version: $(openssl version)" | indent
+
 echo "Decrypting..." | indent
 
 openssl enc -aes-256-cbc -d -in secrets.tar.gz.enc -out secrets.tar.gz -k "$(cat ${ENV_DIR}/SECRET_BUNDLE_PASSPHRASE)"
